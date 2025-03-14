@@ -14,41 +14,25 @@ class AuthController {
    */
   async register(req: Request, res: Response): Promise<void> {
     try {
-      const userData = req.body;
-      const user = await authService.register(userData);
-      
-      // Send successful response (exclude password)
+      console.log("Registration request body:", req.body);
+      const user = await authService.register(req.body);
       res.status(201).json({
         success: true,
         message: 'User registered successfully',
         data: {
           id: user.id,
           username: user.username,
-          email: user.email,
-          role: user.role
+          email: user.email
         }
       });
     } catch (error) {
-      // Handle specific errors
-      if (error instanceof Error) {
-        if (error.message.includes('already')) {
-          res.status(409).json({
-            success: false,
-            message: error.message
-          });
-          return;
-        }
-      }
-      
-      // Generic error handler
-      console.error('Registration error:', error);
-      res.status(500).json({
+      console.error("Registration error:", error);
+      res.status(400).json({
         success: false,
-        message: 'Failed to register user',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Registration failed'
       });
     }
-  }
+  };
 
   /**
    * Login a user

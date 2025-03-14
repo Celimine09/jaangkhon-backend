@@ -7,6 +7,7 @@ import env from './config/env';
 // Import routes
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
+import productRoutes from './routes/product.routes'; 
 
 // Load environment variables
 dotenv.config();
@@ -17,7 +18,7 @@ const PORT = env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: env.CORS_ORIGIN,
+  origin: true, // หรือใช้ '*'
   credentials: true
 }));
 app.use(express.json());
@@ -26,6 +27,8 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/products', productRoutes);
+
 
 // Root route
 app.get('/', (req: Request, res: Response) => {
