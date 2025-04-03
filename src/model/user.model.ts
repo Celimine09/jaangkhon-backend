@@ -10,7 +10,7 @@ export interface UserAttributes {
   firstName?: string;
   lastName?: string;
   profileImage?: string;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'freelancer';
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -28,7 +28,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public firstName!: string | undefined;
   public lastName!: string | undefined;
   public profileImage!: string | undefined;
-  public role!: 'user' | 'admin';
+  public role!: 'user' | 'admin' | 'freelancer';
   public isActive!: boolean;
 
   // Timestamps

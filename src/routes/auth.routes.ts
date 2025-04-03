@@ -77,5 +77,6 @@ router.post('/register', validate(registerValidation), authController.register);
 router.post('/login', validate(loginValidation), authController.login);
 router.post('/change-password', authenticate, validate(changePasswordValidation), authController.changePassword);
 router.get('/profile', authenticate, authController.getProfile);
+router.post('/google-verify', authController.googleVerify);
 
 export default router;

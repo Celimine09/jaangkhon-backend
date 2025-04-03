@@ -1,6 +1,7 @@
 import authService from '../service/auth.service';
 import { Request, Response } from 'express';
-
+import User from '../model/user.model';
+import { generateToken } from '../utils/jwt.util';
 
 /**
  * Controller for handling authentication-related requests
@@ -147,6 +148,64 @@ class AuthController {
       res.status(500).json({
         success: false,
         message: 'Failed to get user profile',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  /**
+   * Verify Google sign-in and create or update user
+   *
+   * @param {Request} req - Express request object
+   * @param {Response} res - Express response object
+   */
+  async googleVerify(req: Request, res: Response): Promise<void> {
+    try {
+      const { email, name, image } = req.body;
+      
+      // ตรวจสอบว่ามีผู้ใช้ที่ใช้อีเมลนี้อยู่แล้วหรือไม่
+      let user = await User.findOne({ where: { email } });
+      
+      if (!user) {
+        // สร้างผู้ใช้ใหม่ถ้ายังไม่มี
+        const username = email.split('@')[0]; // หรือวิธีอื่นในการสร้าง username
+        user = await User.create({
+          email,
+          username,
+          firstName: name?.split(' ')[0] || '',
+          lastName: name?.split(' ').slice(1).join(' ') || '',
+          profileImage: image || '',
+          password: '', // สำหรับผู้ใช้ที่สร้างผ่าน OAuth จะไม่มีรหัสผ่าน
+          isActive: true,
+          role: 'user' // สามารถกำหนดตามความเหมาะสม
+        });
+      }
+      
+      // สร้าง token
+      const token = generateToken({ 
+        userId: user.id, 
+        email: user.email,
+        role: user.role 
+      });
+      
+      // ส่งข้อมูลกลับไปยัง client
+      res.status(200).json({
+        success: true,
+        data: {
+          token,
+          user: {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role: user.role
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Google verify error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to verify Google user',
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
