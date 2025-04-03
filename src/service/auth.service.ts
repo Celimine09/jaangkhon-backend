@@ -1,4 +1,3 @@
-
 import { hashPassword, verifyPassword } from '../utils/password.util';
 import { generateToken } from '../utils/jwt.util';
 import { Op } from 'sequelize';
@@ -71,6 +70,11 @@ class AuthService {
 
     if (!user.isActive) {
       throw new Error('Account is inactive');
+    }
+
+    // ตรวจสอบว่าผู้ใช้มีรหัสผ่านหรือไม่ (กรณีล็อกอินผ่าน OAuth)
+    if (!user.password) {
+      throw new Error('Please login with Google');
     }
 
     // Verify password

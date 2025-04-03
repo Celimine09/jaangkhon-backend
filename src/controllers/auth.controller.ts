@@ -167,8 +167,21 @@ class AuthController {
       let user = await User.findOne({ where: { email } });
       
       if (!user) {
-        // สร้างผู้ใช้ใหม่ถ้ายังไม่มี
-        const username = email.split('@')[0]; // หรือวิธีอื่นในการสร้าง username
+        // สร้าง username จาก email ส่วนแรก
+        let username = email.split('@')[0];
+        
+        // ตรวจสอบว่า username มีอยู่แล้วหรือไม่
+        let usernameExists = await User.findOne({ where: { username } });
+        let counter = 1;
+        
+        // ถ้า username มีอยู่แล้ว ให้เพิ่มตัวเลขต่อท้าย
+        while (usernameExists) {
+          username = `${email.split('@')[0]}${counter}`;
+          usernameExists = await User.findOne({ where: { username } });
+          counter++;
+        }
+        
+        // สร้างผู้ใช้ใหม่
         user = await User.create({
           email,
           username,
@@ -179,6 +192,11 @@ class AuthController {
           isActive: true,
           role: 'user' // สามารถกำหนดตามความเหมาะสม
         });
+      } else {
+        // อัปเดตข้อมูลผู้ใช้หากมีการเปลี่ยนแปลง
+        if (image && !user.profileImage) {
+          await user.update({ profileImage: image });
+        }
       }
       
       // สร้าง token
