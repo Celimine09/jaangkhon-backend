@@ -70,5 +70,7 @@ router.put('/:id', authenticate, validate([...userIdValidation, ...updateUserVal
 router.put('/:id/role', authenticate, authorizeAdmin, validate([...userIdValidation, ...updateUserRoleValidation]), userController.updateUserRole);
 router.delete('/:id', authenticate, validate(userIdValidation), userController.deleteUser);
 router.post('/:id/reset-password', authenticate, authorizeAdmin, validate([...userIdValidation, ...resetPasswordValidation]), userController.resetUserPassword);
+router.post('/', validate(createUserValidation), userController.createUser);
+
 
 export default router;
