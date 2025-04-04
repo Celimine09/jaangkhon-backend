@@ -45,7 +45,7 @@ User.init({
         allowNull: true,
     },
     role: {
-        type: sequelize_1.DataTypes.ENUM('user', 'admin'),
+        type: sequelize_1.DataTypes.ENUM('user', 'admin', 'freelancer'),
         defaultValue: 'user',
     },
     isActive: {

@@ -59,6 +59,10 @@ class AuthService {
         if (!user.isActive) {
             throw new Error('Account is inactive');
         }
+        // ตรวจสอบว่าผู้ใช้มีรหัสผ่านหรือไม่ (กรณีล็อกอินผ่าน OAuth)
+        if (!user.password) {
+            throw new Error('Please login with Google');
+        }
         // Verify password
         const isPasswordValid = await (0, password_util_1.verifyPassword)(user.password, password);
         if (!isPasswordValid) {

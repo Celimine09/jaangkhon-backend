@@ -45,9 +45,9 @@ class ProductService {
    * @returns {Promise<Product>} Product object
    * @throws {Error} If product not found
    */
-  async getProductById(id: number): Promise<Product> {
+  async getProductById(userId: number): Promise<Product> {
     const product = await Product.findOne({
-      where: { id, isActive: true },
+      where: { userId, isActive: true },
       include: [
         {
           model: User,

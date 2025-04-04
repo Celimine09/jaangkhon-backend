@@ -18,7 +18,13 @@ class AuthController {
      */
     async register(req, res) {
         try {
-            console.log("Registration request body:", req.body);
+            const { role } = req.body;
+            if (role && !['user', 'admin'].includes(role)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid role specified'
+                });
+            }
             const user = await auth_service_1.default.register(req.body);
             res.status(201).json({
                 success: true,
@@ -161,8 +167,18 @@ class AuthController {
             // ตรวจสอบว่ามีผู้ใช้ที่ใช้อีเมลนี้อยู่แล้วหรือไม่
             let user = await user_model_1.default.findOne({ where: { email } });
             if (!user) {
-                // สร้างผู้ใช้ใหม่ถ้ายังไม่มี
-                const username = email.split('@')[0]; // หรือวิธีอื่นในการสร้าง username
+                // สร้าง username จาก email ส่วนแรก
+                let username = email.split('@')[0];
+                // ตรวจสอบว่า username มีอยู่แล้วหรือไม่
+                let usernameExists = await user_model_1.default.findOne({ where: { username } });
+                let counter = 1;
+                // ถ้า username มีอยู่แล้ว ให้เพิ่มตัวเลขต่อท้าย
+                while (usernameExists) {
+                    username = `${email.split('@')[0]}${counter}`;
+                    usernameExists = await user_model_1.default.findOne({ where: { username } });
+                    counter++;
+                }
+                // สร้างผู้ใช้ใหม่
                 user = await user_model_1.default.create({
                     email,
                     username,
@@ -173,6 +189,12 @@ class AuthController {
                     isActive: true,
                     role: 'user' // สามารถกำหนดตามความเหมาะสม
                 });
+            }
+            else {
+                // อัปเดตข้อมูลผู้ใช้หากมีการเปลี่ยนแปลง
+                if (image && !user.profileImage) {
+                    await user.update({ profileImage: image });
+                }
             }
             // สร้าง token
             const token = (0, jwt_util_1.generateToken)({

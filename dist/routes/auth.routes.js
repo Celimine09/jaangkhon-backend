@@ -33,7 +33,11 @@ const registerValidation = [
         .optional()
         .trim()
         .isLength({ max: 50 })
-        .withMessage('Last name cannot exceed 50 characters')
+        .withMessage('Last name cannot exceed 50 characters'),
+    (0, express_validator_1.body)('role')
+        .optional()
+        .isIn(['user', 'admin'])
+        .withMessage('Role must be either "user" or "admin"'),
 ];
 // Login validation rules
 const loginValidation = [

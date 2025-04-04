@@ -41,6 +41,7 @@ const productValidation = [
 // Public routes (no authentication required)
 router.get('/', product_controller_1.default.getProducts);
 router.get('/:id', product_controller_1.default.getProductById);
+router.get('/user/:userId', product_controller_1.default.getProductsByUser);
 // Protected routes (authentication required)
 router.post('/', auth_middleware_1.authenticate, (0, validate_middleware_1.validate)(productValidation), product_controller_1.default.createProduct);
 router.put('/:id', auth_middleware_1.authenticate, (0, validate_middleware_1.validate)(productValidation), product_controller_1.default.updateProduct);
