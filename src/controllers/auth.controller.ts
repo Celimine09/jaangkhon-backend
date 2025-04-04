@@ -13,9 +13,16 @@ class AuthController {
    * @param {Request} req - Express request object
    * @param {Response} res - Express response object
    */
-  async register(req: Request, res: Response): Promise<void> {
+  async register(req: Request, res: Response) {
     try {
-      console.log("Registration request body:", req.body);
+      const { role } = req.body;
+      if (role && !['user', 'admin'].includes(role)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid role specified'
+        });
+      }
+      
       const user = await authService.register(req.body);
       res.status(201).json({
         success: true,
