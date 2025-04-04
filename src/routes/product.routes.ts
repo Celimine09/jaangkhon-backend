@@ -44,6 +44,7 @@ const productValidation = [
 // Public routes (no authentication required)
 router.get('/', productController.getProducts);
 router.get('/:id', productController.getProductById);
+router.get('/user/:userId', productController.getProductsByUser);
 
 // Protected routes (authentication required)
 router.post('/', authenticate, validate(productValidation), productController.createProduct);

@@ -1,5 +1,6 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import sequelize from '../config/database';
+import User from './user.model';
 
 // Product attributes interface
 export interface ProductAttributes {
@@ -11,6 +12,7 @@ export interface ProductAttributes {
   category: string;
   stock: number;
   isActive: boolean;
+  userId: number; 
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -28,6 +30,7 @@ class Product extends Model<ProductAttributes, ProductCreationAttributes> implem
   public category!: string;
   public stock!: number;
   public isActive!: boolean;
+  public userId!: number; // เพิ่ม property นี้
 
   // Timestamps
   public readonly createdAt!: Date;
@@ -71,6 +74,14 @@ Product.init(
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'users',
+        key: 'id'
+      }
+    }
   },
   {
     sequelize,
@@ -81,8 +92,16 @@ Product.init(
         name: 'products_category_idx',
         fields: ['category'],
       },
+      {
+        name: 'products_userId_idx',
+        fields: ['userId'],
+      },
     ],
   }
 );
+
+// กำหนดความสัมพันธ์กับโมเดล User (อย่าลืม import User model)
+Product.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(Product, { foreignKey: 'userId' });
 
 export default Product;
