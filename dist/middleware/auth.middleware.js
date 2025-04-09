@@ -12,9 +12,8 @@ const user_model_1 = __importDefault(require("../model/user.model"));
 // ใน auth.middleware.ts
 const authenticate = async (req, res, next) => {
     try {
-        // ดูค่า Authorization header
-        console.log('Auth header:', req.headers.authorization);
-        // แกะ token
+        
+        
         const authHeader = req.headers.authorization;
         const token = (0, jwt_util_1.extractTokenFromHeader)(authHeader);
         if (!token) {
@@ -26,7 +25,7 @@ const authenticate = async (req, res, next) => {
         }
         // ดูข้อมูลที่แกะได้จาก token
         const decoded = (0, jwt_util_1.verifyToken)(token);
-        console.log('Decoded token:', decoded);
+        
         if (!decoded) {
             console.log('Invalid token');
             return res.status(401).json({
@@ -38,7 +37,7 @@ const authenticate = async (req, res, next) => {
         const user = await user_model_1.default.findByPk(decoded.userId, {
             attributes: { exclude: ['password'] }
         });
-        console.log('User from database:', user ? user.toJSON() : null);
+        
         if (!user) {
             console.log('User not found');
             return res.status(404).json({
@@ -48,7 +47,7 @@ const authenticate = async (req, res, next) => {
         }
         // ตรวจสอบการเซ็ตค่า req.user
         req.user = user;
-        console.log('req.user set to:', req.user.toJSON());
+        
         next();
     }
     catch (error) {

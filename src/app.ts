@@ -7,13 +7,17 @@ import env from './config/env';
 // Import routes
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
-import productRoutes from './routes/product.routes'; 
+import productRoutes from './routes/product.routes';
 
 // Load environment variables
 dotenv.config();
 
 // Initialize Express application
 const app: Application = express();
+
+// Hide Express version information
+app.disable('x-powered-by');
+
 const PORT = env.PORT || 5000;
 
 // Middleware
@@ -52,7 +56,7 @@ const initializeApp = async () => {
   try {
     // Test database connection
     await testConnection();
-    
+
     // Sync models with database (development only)
     if (env.NODE_ENV === 'development') {
       await sequelize.sync({ alter: true });

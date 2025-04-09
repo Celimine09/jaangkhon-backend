@@ -13,7 +13,6 @@ export const hashPassword = async (password: string): Promise<string> => {
       memoryCost: 2 ** 16, // 64 MiB memory 
       timeCost: 3, // 3 iterations
       parallelism: 1, // 1 thread
-      saltLength: 16, // 16-byte salt
       hashLength: 32, // 32-byte hash
     });
   } catch (error) {

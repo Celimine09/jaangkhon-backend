@@ -16,13 +16,13 @@ class AuthController {
   async register(req: Request, res: Response) {
     try {
       const { role } = req.body;
-      if (role && !['user', 'admin'].includes(role)) {
+      if (role && !['user', 'admin', 'freelancer'].includes(role)) {
         return res.status(400).json({
           success: false,
           message: 'Invalid role specified'
         });
       }
-      
+
       const user = await authService.register(req.body);
       res.status(201).json({
         success: true,
@@ -52,7 +52,7 @@ class AuthController {
     try {
       const { email, password } = req.body;
       const result = await authService.login(email, password);
-      
+
       res.status(200).json({
         success: true,
         message: 'Login successful',
@@ -68,7 +68,7 @@ class AuthController {
           });
           return;
         }
-        
+
         if (error.message === 'Account is inactive') {
           res.status(403).json({
             success: false,
@@ -77,7 +77,7 @@ class AuthController {
           return;
         }
       }
-      
+
       // Generic error handler
       console.error('Login error:', error);
       res.status(500).json({
@@ -98,9 +98,9 @@ class AuthController {
     try {
       const userId = req.user.id;
       const { currentPassword, newPassword } = req.body;
-      
+
       await authService.changePassword(userId, currentPassword, newPassword);
-      
+
       res.status(200).json({
         success: true,
         message: 'Password changed successfully'
@@ -115,7 +115,7 @@ class AuthController {
           });
           return;
         }
-        
+
         if (error.message === 'User not found') {
           res.status(404).json({
             success: false,
@@ -124,7 +124,7 @@ class AuthController {
           return;
         }
       }
-      
+
       // Generic error handler
       console.error('Password change error:', error);
       res.status(500).json({
@@ -145,7 +145,7 @@ class AuthController {
     try {
       // User is already attached to request by auth middleware
       const user = req.user;
-      
+
       res.status(200).json({
         success: true,
         data: user
@@ -169,25 +169,25 @@ class AuthController {
   async googleVerify(req: Request, res: Response): Promise<void> {
     try {
       const { email, name, image } = req.body;
-      
+
       // ตรวจสอบว่ามีผู้ใช้ที่ใช้อีเมลนี้อยู่แล้วหรือไม่
       let user = await User.findOne({ where: { email } });
-      
+
       if (!user) {
         // สร้าง username จาก email ส่วนแรก
         let username = email.split('@')[0];
-        
+
         // ตรวจสอบว่า username มีอยู่แล้วหรือไม่
         let usernameExists = await User.findOne({ where: { username } });
         let counter = 1;
-        
+
         // ถ้า username มีอยู่แล้ว ให้เพิ่มตัวเลขต่อท้าย
         while (usernameExists) {
           username = `${email.split('@')[0]}${counter}`;
           usernameExists = await User.findOne({ where: { username } });
           counter++;
         }
-        
+
         // สร้างผู้ใช้ใหม่
         user = await User.create({
           email,
@@ -197,7 +197,7 @@ class AuthController {
           profileImage: image || '',
           password: '', // สำหรับผู้ใช้ที่สร้างผ่าน OAuth จะไม่มีรหัสผ่าน
           isActive: true,
-          role: 'user' // สามารถกำหนดตามความเหมาะสม
+          role: 'user'
         });
       } else {
         // อัปเดตข้อมูลผู้ใช้หากมีการเปลี่ยนแปลง
@@ -205,14 +205,14 @@ class AuthController {
           await user.update({ profileImage: image });
         }
       }
-      
+
       // สร้าง token
-      const token = generateToken({ 
-        userId: user.id, 
+      const token = generateToken({
+        userId: user.id,
         email: user.email,
-        role: user.role 
+        role: user.role
       });
-      
+
       // ส่งข้อมูลกลับไปยัง client
       res.status(200).json({
         success: true,

@@ -84,12 +84,11 @@ const initializeApp = async () => {
         // Sync models with database (development only)
         if (env_1.default.NODE_ENV === 'development') {
             await database_1.default.sync({ alter: true });
-            console.log('Database synchronized');
+            
         }
         // Start the server
         app.listen(PORT, () => {
-            console.log(`Server running in ${env_1.default.NODE_ENV} mode on port ${PORT}`);
-            console.log(`API available at http://localhost:${PORT}`);
+            
         });
     }
     catch (error) {
